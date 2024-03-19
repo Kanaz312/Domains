@@ -2,6 +2,7 @@
 <html>
 <head>
 	<script src="/assets/javascript/htmx.min.js"></script>
+	<script src="/assets/javascript/drag.js"></script>
 	<link rel="stylesheet" href="/assets/css/style.css"></link>
 </head>
 <body>
@@ -28,8 +29,12 @@
 			We need to build more churces m'lord.
 		</div>
 		<div class="scenario-element" id="deck">
-			<img class="card" src="/assets/images/cards/cardback.png">
-			<img class="card" id="top-card" src="/assets/images/cards/jack.png">
+			<div class="card-slot" id="deck-cards-container">
+				<img class="card" src="/assets/images/cards/cardback.png" draggable="false">
+			</div>
+			<div class="card-slot" id="top-card-container">
+				<img class="card" id="top-card" src="/assets/images/cards/jack.png" draggable="false">
+			</div>
 		</div>
 		<div class="scenario-element" id="answer">
 			Build the curch.

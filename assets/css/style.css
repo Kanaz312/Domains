@@ -53,13 +53,16 @@
 	justify-content: center;
 }
 
-#deck .card {
+#deck .card-slot {
 	grid-column: 1;
 	grid-row: 1;
-	align-self: center;
-	transition: 0.25s ease-out;
 }
 
-#deck #top-card:hover {
-	transform: translate(-30%, 4%) rotate(-15deg);
+#deck #top-card-container {
+	touch-action: none;
+}
+
+#deck #top-card-container #top-card {
+	touch-action: none;
+	user-select: none;
 }
