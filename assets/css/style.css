@@ -1,0 +1,65 @@
+#stats{
+	height: 100%;
+	width: 100%;
+	font-size: 0;
+}
+
+.stat {
+	display: inline-block;
+	*display: inline;
+	zoom: 1;
+	vertical-align: top;
+	text-align: center;
+	font-size: 12px;
+}
+
+#cross {
+	width: 25%;
+}
+
+#population {
+	width: 25%;
+}
+
+#sword {
+	width: 25%;
+}
+
+#money {
+	width: 25%;
+}
+
+.stat-bar {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#scenario {
+	display: block;
+	width: 100%;
+	padding-top: 2%;
+	text-align: center;
+}
+
+.scenario-element {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+
+#deck {
+	display: grid;
+	justify-content: center;
+}
+
+#deck .card {
+	grid-column: 1;
+	grid-row: 1;
+	align-self: center;
+	transition: 0.25s ease-out;
+}
+
+#deck #top-card:hover {
+	transform: translate(-30%, 4%) rotate(-15deg);
+}

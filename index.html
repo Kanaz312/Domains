@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="/javascript/htmx.min.js"></script>
+	<link rel="stylesheet" href="/assets/css/style.css"></link>
+</head>
+<body>
+	<div id="stats">
+		<div class="stat" id="cross">
+			Cross
+			<progress id="cross-bar" class="stat-bar" value="43" max="100"></progress>
+		</div>
+		<div class="stat" id="population">
+			Population
+			<progress id="population-bar" class="stat-bar" value="20" max="100"></progress>
+		</div>
+		<div class="stat" id="sword">
+			Sword
+			<progress id="sword-bar" class="stat-bar" value="88" max="100"></progress>
+		</div>
+		<div class="stat" id="money">
+			Money
+			<progress id="money-bar" class="stat-bar" value="63" max="100"></progress>
+		</div>
+	</div>
+	<div id="scenario">
+		<div class="scenario-element" id="promt">
+			We need to build more churces m'lord.
+		</div>
+		<div class="scenario-element" id="deck">
+			<img class="card" src="/assets/images/cards/cardback.png">
+			<img class="card" id="top-card" src="/assets/images/cards/jack.png">
+		</div>
+		<div class="scenario-element" id="answer">
+			Build the curch.
+		</div>
+	</div>
+</body>
+</html>
