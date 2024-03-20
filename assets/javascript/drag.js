@@ -2,6 +2,8 @@
 
 document.addEventListener("DOMContentLoaded", initialize, false);
 
+// const gameStateUpdateEvent = new Event("game-state-update");
+
 var dragItem;
 var container;
 var active = false;
@@ -48,6 +50,19 @@ function dragEnd(e) {
 	setTranslate(0, 0, dragItem);
 	dragItem.style.transition = "0.4s ease-out";
 	active = false;
+
+	let w = window.innerWidth
+
+	if (e.clientX < w / 4.0)
+	{
+		fetch("http://localhost:8080/left", {method : "post"});
+	}
+	else if (e.clientX > 3.0 * w / 4.0)
+	{
+		fetch("http://localhost:8080/right", {method : "post"});
+	}
+
+	htmx.trigger("#stats", "game-state-update");
 }
 
 function drag(e) {

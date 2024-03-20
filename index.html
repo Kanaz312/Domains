@@ -6,23 +6,24 @@
 	<link rel="stylesheet" href="/assets/css/style.css"></link>
 </head>
 <body>
-	<div id="stats">
+	<div id="stats" hx-get="/stats" hx-trigger="game-state-update">
 		<div class="stat" id="cross">
 			Cross
-			<progress id="cross-bar" class="stat-bar" value="43" max="100"></progress>
+			<progress id="cross-bar" class="stat-bar" value="{{ .Cross }}" max="100"></progress>
 		</div>
 		<div class="stat" id="population">
 			Population
-			<progress id="population-bar" class="stat-bar" value="20" max="100"></progress>
+			<progress id="population-bar" class="stat-bar" value="{{ .Population }}" max="100"></progress>
 		</div>
 		<div class="stat" id="sword">
 			Sword
-			<progress id="sword-bar" class="stat-bar" value="88" max="100"></progress>
+			<progress id="sword-bar" class="stat-bar" value="{{ .Sword }}" max="100"></progress>
 		</div>
 		<div class="stat" id="money">
 			Money
-			<progress id="money-bar" class="stat-bar" value="63" max="100"></progress>
+			<progress id="money-bar" class="stat-bar" value="{{ .Money }}" max="100"></progress>
 		</div>
+
 	</div>
 	<div id="scenario">
 		<div class="scenario-element" id="promt">
