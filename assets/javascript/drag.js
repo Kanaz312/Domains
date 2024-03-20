@@ -2,8 +2,6 @@
 
 document.addEventListener("DOMContentLoaded", initialize, false);
 
-// const gameStateUpdateEvent = new Event("game-state-update");
-
 var dragItem;
 var container;
 var active = false;
