@@ -1,3 +1,9 @@
+body {
+	background-color: #35374B;
+	color: white;
+	font-size: 30px;
+}
+
 #stats{
 	height: 100%;
 	width: 100%;
@@ -11,6 +17,24 @@
 	vertical-align: top;
 	text-align: center;
 	font-size: 12px;
+}
+
+progress::-moz-progress-bar { 
+	border: 0px;
+	border-radius: 20px;
+	background: #48B7B2;
+}
+
+progress::-webkit-progress-value {
+	border: 0px;
+	border-radius: 20px;
+	background: #48B7B2;
+}
+
+progress { 
+	color: #48B7B2;
+	border: 0px;
+	border-radius: 20px;
 }
 
 #cross {

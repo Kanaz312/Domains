@@ -8,19 +8,19 @@
 <body>
 	<div id="stats" hx-get="/stats" hx-trigger="game-state-update">
 		<div class="stat" id="cross">
-			Cross
+			<h2>Cross</h2>
 			<progress id="cross-bar" class="stat-bar" value="{{ .Cross }}" max="100"></progress>
 		</div>
 		<div class="stat" id="population">
-			Population
+			<h2>Population</h2>
 			<progress id="population-bar" class="stat-bar" value="{{ .Population }}" max="100"></progress>
 		</div>
 		<div class="stat" id="sword">
-			Sword
+			<h2>Sword</h2>
 			<progress id="sword-bar" class="stat-bar" value="{{ .Sword }}" max="100"></progress>
 		</div>
 		<div class="stat" id="money">
-			Money
+			<h2>Money</h2>
 			<progress id="money-bar" class="stat-bar" value="{{ .Money }}" max="100"></progress>
 		</div>
 
