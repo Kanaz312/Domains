@@ -1,3 +1,4 @@
 main
 assets/images/
 assets/javascript/htmx.min.js
+*.vim
