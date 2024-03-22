@@ -5,10 +5,6 @@ document.addEventListener("DOMContentLoaded", initialize, false);
 var dragItem;
 var container;
 var active = false;
-var currentX;
-var currentY;
-var initialX;
-var initialY;
 
 function initialize(e) {
 
@@ -25,14 +21,6 @@ function initialize(e) {
 }
 
 function dragStart(e) {
-	if (e.type === "touchstart") {
-		initialX = e.touches[0].clientX;
-		initialY = e.touches[0].clientY;
-	} else {
-		initialX = e.clientX;
-		initialY = e.clientY;
-	}
-
 	if (e.target === dragItem) {
 		active = true;
 	}
@@ -41,10 +29,6 @@ function dragStart(e) {
 }
 
 function dragEnd(e) {
-	initialX = 0;
-	initialY = 0;
-
-
 	setTranslate(0, 0, dragItem);
 	dragItem.style.transition = "0.4s ease-out";
 	active = false;
@@ -67,14 +51,19 @@ function drag(e) {
 	if (active) {
 
 		e.preventDefault();
-
+		let currentX;
+		let currentY;
 		if (e.type === "touchmove") {
-			currentX = e.touches[0].clientX - initialX;
-			currentY = e.touches[0].clientY - initialY;
+			currentX = e.touches[0].clientX;
+			currentY = e.touches[0].clientY;
 		} else {
-			currentX = e.clientX - initialX;
-			currentY = e.clientY - initialY;
+			currentX = e.clientX;
+			currentY = e.clientY;
 		}
+
+		let boundingRect = container.getBoundingClientRect()
+		currentX -= boundingRect.x + (boundingRect.width / 2);
+		currentY -= boundingRect.y + (boundingRect.height / 2);
 
 		setTranslate(currentX, currentY, dragItem);
 	}
