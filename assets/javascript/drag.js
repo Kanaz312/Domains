@@ -1,23 +1,42 @@
 // Modified from https://www.kirupa.com/html5/drag.htm
 
-document.addEventListener("DOMContentLoaded", initialize, false);
+window.addEventListener("DOMContentLoaded", (e) => {document.querySelector("#scenario").addEventListener("mouseover", initialize, false);}, false);
 
-var dragItem;
-var container;
+
+var dragItem = null;
+var container = null;
+var leftAnswer = null;
+var rightAnswer = null;
 var active = false;
 
 function initialize(e) {
 
-	dragItem = document.querySelector("#top-card");
-	container = document.querySelector("#top-card-container");
+	if ((dragItem === null || container === null)) {
+		dragItem = document.querySelector("#top-card");
+		container = document.querySelector("#top-card-container");
+		leftAnswer = document.querySelector("#answer-left");
+		rightAnswer = document.querySelector("#answer-right");
 
-	container.addEventListener("touchstart", dragStart, false);
-	container.addEventListener("touchend", dragEnd, false);
-	container.addEventListener("touchmove", drag, false);
+		container.addEventListener("touchstart", dragStart, false);
+		container.addEventListener("touchend", dragEnd, false);
+		container.addEventListener("touchmove", drag, false);
 
-	container.addEventListener("mousedown", dragStart, false);
-	container.addEventListener("mouseup", dragEnd, false);
-	container.addEventListener("mousemove", drag, false);
+		container.addEventListener("mousedown", dragStart, false);
+		container.addEventListener("mouseup", dragEnd, false);
+		container.addEventListener("mousemove", drag, false);
+	}
+}
+
+// Returns -1 for left, 0 for neutral, 1 for right
+function getSide(x) {
+	let w = window.innerWidth
+	if (x < w / 4.0) {
+		return -1;
+	} else if (x > 3.0 * w / 4.0) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 function dragStart(e) {
@@ -33,39 +52,70 @@ function dragEnd(e) {
 	dragItem.style.transition = "0.4s ease-out";
 	active = false;
 
-	let w = window.innerWidth
+	let sentRequest = false;
 
-	if (e.clientX < w / 4.0)
-	{
+	let x = 0.0;
+	if (e.type === "touchend") {
+		x = e.touches[0].clientX;
+	} else {
+		x = e.clientX;
+	}
+
+	let side = getSide(x);
+
+	if (side == -1) {
 		fetch("http://localhost:8080/left", {method : "post"});
+		htmx.trigger("#stats", "game-state-update");
+		sentRequest = true;
 	}
-	else if (e.clientX > 3.0 * w / 4.0)
-	{
+	else if (side === 1) {
 		fetch("http://localhost:8080/right", {method : "post"});
+		htmx.trigger("#stats", "game-state-update");
+		sentRequest = true;
 	}
 
-	htmx.trigger("#stats", "game-state-update");
+	if (sentRequest) {
+		dragItem = null;
+		container = null;
+
+		leftAnswer.removeAttribute("style");
+		rightAnswer.removeAttribute("style");
+		leftAnswer = null;
+		rightAnswer = null;
+	}
 }
 
 function drag(e) {
 	if (active) {
 
 		e.preventDefault();
-		let currentX;
-		let currentY;
+		let x;
+		let y;
 		if (e.type === "touchmove") {
-			currentX = e.touches[0].clientX;
-			currentY = e.touches[0].clientY;
+			x = e.touches[0].clientX;
+			y = e.touches[0].clientY;
 		} else {
-			currentX = e.clientX;
-			currentY = e.clientY;
+			x = e.clientX;
+			y = e.clientY;
+		}
+
+		let side = getSide(x);
+		if (side === -1) {
+			leftAnswer.style.display = "block";
+			rightAnswer.style.display = "none";
+		} else if (side === 1) {
+			leftAnswer.style.display = "none";
+			rightAnswer.style.display = "block";
+		} else {
+			leftAnswer.style.display = "none";
+			rightAnswer.style.display = "none";
 		}
 
 		let boundingRect = container.getBoundingClientRect()
-		currentX -= boundingRect.x + (boundingRect.width / 2);
-		currentY -= boundingRect.y + (boundingRect.height / 2);
+		x -= boundingRect.x + (boundingRect.width / 2);
+		y -= boundingRect.y + (boundingRect.height / 2);
 
-		setTranslate(currentX, currentY, dragItem);
+		setTranslate(x, y, dragItem);
 	}
 }
 

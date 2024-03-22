@@ -12,8 +12,6 @@ body {
 
 .stat {
 	display: inline-block;
-	*display: inline;
-	zoom: 1;
 	vertical-align: top;
 	text-align: center;
 	font-size: 12px;
@@ -89,4 +87,14 @@ progress {
 #deck #top-card-container #top-card {
 	touch-action: none;
 	user-select: none;
+}
+
+
+#answer-left {
+	display: none;
+}
+
+
+#answer-right {
+	display: none;
 }

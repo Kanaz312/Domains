@@ -55,6 +55,15 @@ func (s *serverState) statsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+var scenarioTpl = template.Must(template.ParseFiles("assets/static/scenario.html"))
+
+func (s *serverState) scenarioHandler(w http.ResponseWriter, r *http.Request) {
+	err := scenarioTpl.Execute(w, s.GameStates[0].Scenario)
+	if err != nil {
+		fmt.Printf("Failed to execute assets/static/scenario.html %v\n", err)
+	}
+}
+
 func (s *serverState) leftHandler(w http.ResponseWriter, r *http.Request) {
 	currentGameState := &s.GameStates[0]
 	currentScenario := currentGameState.Scenario
@@ -105,6 +114,7 @@ func main() {
 
 	http.HandleFunc("/", mainServerState.indexHandler)
 	http.HandleFunc("/stats", mainServerState.statsHandler)
+	http.HandleFunc("/scenario", mainServerState.scenarioHandler)
 	http.HandleFunc("/left", mainServerState.leftHandler)
 	http.HandleFunc("/right", mainServerState.rightHandler)
 
