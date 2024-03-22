@@ -29,6 +29,7 @@ type gameState struct {
 	Sword int;
 	Money int;
 	Scenario scenario;
+	ScenarioIndex int;
 }
 
 type serverState struct {
@@ -73,6 +74,10 @@ func (s *serverState) leftHandler(w http.ResponseWriter, r *http.Request) {
 	currentGameState.Sword += currentScenario.LeftDecision.Sword
 	currentGameState.Money += currentScenario.LeftDecision.Money
 
+	currentGameState.ScenarioIndex = (currentGameState.ScenarioIndex + 1) % len(s.Scenarios)
+	currentGameState.Scenario = s.Scenarios[currentGameState.ScenarioIndex]
+	log.Printf("%v", currentGameState.Scenario)
+
 	w.WriteHeader(http.StatusAccepted)
 	w.Write([]byte("200 - Left Received"))
 	log.Printf("Handled left, new stats: %d %d %d %d\n", currentGameState.Cross, currentGameState.Population, currentGameState.Sword, currentGameState.Money)
@@ -86,6 +91,9 @@ func (s *serverState) rightHandler(w http.ResponseWriter, r *http.Request) {
 	currentGameState.Population += currentScenario.RightDecision.Population
 	currentGameState.Sword += currentScenario.RightDecision.Sword
 	currentGameState.Money += currentScenario.RightDecision.Money
+
+	currentGameState.ScenarioIndex = (currentGameState.ScenarioIndex + 1) % len(s.Scenarios)
+	currentGameState.Scenario = s.Scenarios[currentGameState.ScenarioIndex]
 
 	w.WriteHeader(http.StatusAccepted)
 	w.Write([]byte("200 - Right Received"))
@@ -105,8 +113,8 @@ func main() {
 	mainServerState.Scenarios[0] = scenario0
 	mainServerState.Scenarios[1] = scenario1
 
-	sampleState := gameState{50, 50, 50, 50, scenario0}
-	mainServerState.GameStates[0] = sampleState ;
+	sampleState := gameState{50, 50, 50, 50, scenario0, 0}
+	mainServerState.GameStates[0] = sampleState
 
 	fs := http.FileServer(http.Dir("assets"))
 
