@@ -1,31 +1,18 @@
 // Modified from https://www.kirupa.com/html5/drag.htm
 
-window.addEventListener("DOMContentLoaded", (e) => {document.querySelector("#scenario").addEventListener("mouseover", initialize, false);}, false);
-
-
-var dragItem = null;
-var container = null;
-var leftAnswer = null;
-var rightAnswer = null;
+var dragItem = document.querySelector("#top-card");
+var container = document.querySelector("#top-card-container");
+var leftAnswer = document.querySelector("#answer-left");
+var rightAnswer = document.querySelector("#answer-right");
 var active = false;
 
-function initialize(e) {
+container.addEventListener("touchstart", dragStart, false);
+container.addEventListener("touchend", dragEnd, false);
+container.addEventListener("touchmove", drag, false);
 
-	if ((dragItem === null || container === null)) {
-		dragItem = document.querySelector("#top-card");
-		container = document.querySelector("#top-card-container");
-		leftAnswer = document.querySelector("#answer-left");
-		rightAnswer = document.querySelector("#answer-right");
-
-		container.addEventListener("touchstart", dragStart, false);
-		container.addEventListener("touchend", dragEnd, false);
-		container.addEventListener("touchmove", drag, false);
-
-		container.addEventListener("mousedown", dragStart, false);
-		container.addEventListener("mouseup", dragEnd, false);
-		container.addEventListener("mousemove", drag, false);
-	}
-}
+container.addEventListener("mousedown", dragStart, false);
+container.addEventListener("mouseup", dragEnd, false);
+container.addEventListener("mousemove", drag, false);
 
 // Returns -1 for left, 0 for neutral, 1 for right
 function getSide(x) {
@@ -77,19 +64,13 @@ function dragEnd(e) {
 	}
 
 	if (sentRequest) {
-		dragItem = null;
-		container = null;
-
 		leftAnswer.removeAttribute("style");
 		rightAnswer.removeAttribute("style");
-		leftAnswer = null;
-		rightAnswer = null;
 	}
 }
 
 function drag(e) {
 	if (active) {
-
 		e.preventDefault();
 		let x;
 		let y;
