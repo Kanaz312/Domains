@@ -2,9 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
+	"strconv"
 )
 
 type decision struct {
@@ -35,24 +38,96 @@ type gameState struct {
 type serverState struct {
 	GameStates []gameState;
 	Scenarios []scenario;
+	CookieIndex int;
 }
 
+func (s *serverState) makeSession() (int, http.Cookie) {
+	index := s.CookieIndex
+	cookieValue := fmt.Sprintf("%d", index)
+
+	newSessionCookie := http.Cookie {
+		Name: "session",
+		Value: cookieValue,
+
+		Secure: true,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	sampleState := gameState{50, 50, 50, 50, s.Scenarios[0], 0}
+	s.GameStates = append(s.GameStates, sampleState)
+
+	s.CookieIndex++
+
+	return index, newSessionCookie
+}
 
 var indexTpl = template.Must(template.ParseFiles("index.html"))
 
 func (s *serverState) indexHandler(w http.ResponseWriter, r *http.Request) {
-	err := indexTpl.Execute(w, s.GameStates[0])
-	if err != nil {
+	index := 0
+	if cookie, err := r.Cookie("session"); err != nil {
+		switch {
+		case errors.Is(err, http.ErrNoCookie):
+			newIndex, newSessionCookie := s.makeSession()
+			index = newIndex
+			http.SetCookie(w, &newSessionCookie)
+		default:
+			log.Println(err)
+			http.Error(w, "server error", http.StatusInternalServerError)
+			return
+		}
+	} else {
+		index, err = strconv.Atoi(cookie.Value)
+		if err != nil || index >= s.CookieIndex {
+			http.Error(w, "invalid session", http.StatusUnauthorized)
+			return
+		}
+	}
+	
+	if err := indexTpl.Execute(w, s.GameStates[index]); err != nil {
 		fmt.Printf("Failed to execute index.html %v\n", err)
+	}
+}
+
+type sessionParsingError struct{
+}
+
+func (e *sessionParsingError) Error() string {
+	return "Failed to parse session cookie"
+}
+
+func (s *serverState) getUserSession(w http.ResponseWriter, r *http.Request) (int, error) {
+	if cookie, err := r.Cookie("session"); err != nil {
+		switch {
+		case errors.Is(err, http.ErrNoCookie):
+			http.Error(w, "session token not found", http.StatusBadRequest)
+		default:
+			log.Println(err)
+			http.Error(w, "server error", http.StatusInternalServerError)
+		}
+
+		return -1, err
+	} else {
+		index, err := strconv.Atoi(cookie.Value)
+		if err != nil || index >= s.CookieIndex {
+			http.Error(w, "invalid session", http.StatusUnauthorized)
+			return -1, &sessionParsingError{}
+		} else {
+			return index, nil
+		}
 	}
 }
 
 var gameStateElementsTpl = template.Must(template.ParseFiles("assets/static/gameStateElements.html"))
 
 func (s *serverState) gameStateElementsHandler(w http.ResponseWriter, r *http.Request) {
-	err := gameStateElementsTpl.Execute(w, s.GameStates[0])
-	if err != nil {
-		fmt.Printf("Failed to execute assets/static/gameStateElements.html %v\n", err)
+	if index, err := s.getUserSession(w, r); err == nil {
+		err := gameStateElementsTpl.Execute(w, s.GameStates[index])
+		if err != nil {
+			fmt.Printf("Failed to execute assets/static/gameStateElements.html %v\n", err)
+			http.Error(w, "server error", http.StatusInternalServerError)
+		}
 	}
 }
 
@@ -61,7 +136,11 @@ type decisionRequest struct {
 }
 
 func (s *serverState) decisionHandler(w http.ResponseWriter, r *http.Request) {
-	currentGameState := &s.GameStates[0]
+	index, err := s.getUserSession(w, r)
+	if err != nil {
+		return
+	}
+	currentGameState := &s.GameStates[index]
 	currentScenario := currentGameState.Scenario
 	
 	var choice decisionRequest
@@ -103,13 +182,10 @@ func main() {
 	right1 := decision{0, 30, -30, 0, "Steal from our neighbors"}
 	scenario1 := scenario{"The people are going hungry", "queen", left1, right1}
 
-	mainServerState := serverState{make([]gameState, 5), make([]scenario, 2)}
+	mainServerState := serverState{make([]gameState, 0, 5), make([]scenario, 2, 5), 0}
 
 	mainServerState.Scenarios[0] = scenario0
 	mainServerState.Scenarios[1] = scenario1
-
-	sampleState := gameState{50, 50, 50, 50, scenario0, 0}
-	mainServerState.GameStates[0] = sampleState
 
 	fs := http.FileServer(http.Dir("assets"))
 
