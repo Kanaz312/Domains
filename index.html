@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<script src="/assets/javascript/htmx.min.js"></script>
-	<link rel="stylesheet" href="/assets/css/style.css"></link>
-	<title>Domains</title>
-</head>
-<body>
-	<div id="stats" hx-get="/stats" hx-trigger="load,game-state-update"></div>
-	<div id="scenario" hx-get="/scenario" hx-trigger="load,game-state-update"></div>
-</body>
+	<head>
+		<script src="/assets/javascript/htmx.min.js"></script>
+		<link rel="stylesheet" href="/assets/css/style.css"></link>
+		<title>Domains</title>
+	</head>
+	<body hx-get="/gameStateElements" hx-trigger="load">
+		<div id="stats">
+		</div>
+	</body>
 </html>

@@ -1,0 +1,38 @@
+<div id="stats">
+	<div class="stat" id="cross">
+		<h2>Cross</h2>
+		<progress id="cross-bar" class="stat-bar" value="{{ .Cross }}" max="100"></progress>
+	</div>
+	<div class="stat" id="population">
+		<h2>Population</h2>
+		<progress id="population-bar" class="stat-bar" value="{{ .Population }}" max="100"></progress>
+	</div>
+	<div class="stat" id="sword">
+		<h2>Sword</h2>
+		<progress id="sword-bar" class="stat-bar" value="{{ .Sword }}" max="100"></progress>
+	</div>
+	<div class="stat" id="money">
+		<h2>Money</h2>
+		<progress id="money-bar" class="stat-bar" value="{{ .Money }}" max="100"></progress>
+	</div>
+</div>
+<div id="scenario" hx-get="/gameStateElements" hx-trigger="game-state-update" hx-target="body">
+	<div class="scenario-element" id="promt">
+		{{ .Scenario.Prompt }}
+	</div>
+	<div class="scenario-element" id="deck">
+		<div class="card-slot" id="deck-cards-container">
+			<img class="card" src="/assets/images/cards/cardback.png" draggable="false">
+		</div>
+		<div class="card-slot" id="top-card-container">
+			<img class="card" id="top-card" src="/assets/images/cards/{{ .Scenario.Image }}.png" draggable="false">
+		</div>
+	</div>
+	<div class="scenario-element" id="answer-left">
+		{{ .Scenario.LeftDecision.Description }}
+	</div>
+	<div class="scenario-element" id="answer-right">
+		{{ .Scenario.RightDecision.Description }}
+	</div>
+</div>
+<script src="/assets/javascript/drag.js"></script>

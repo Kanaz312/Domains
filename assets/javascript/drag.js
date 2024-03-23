@@ -52,13 +52,11 @@ function dragEnd(e) {
 
 	if (side == -1) {
 		fetch("http://localhost:8080/left", {method : "post"});
-		htmx.trigger("#stats", "game-state-update");
 		htmx.trigger("#scenario", "game-state-update");
 		sentRequest = true;
 	}
 	else if (side === 1) {
 		fetch("http://localhost:8080/right", {method : "post"});
-		htmx.trigger("#stats", "game-state-update");
 		htmx.trigger("#scenario", "game-state-update");
 		sentRequest = true;
 	}
