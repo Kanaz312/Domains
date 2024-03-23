@@ -47,24 +47,6 @@ func (s *serverState) indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-var statTpl = template.Must(template.ParseFiles("assets/static/stats.html"))
-
-func (s *serverState) statsHandler(w http.ResponseWriter, r *http.Request) {
-	err := statTpl.Execute(w, s.GameStates[0])
-	if err != nil {
-		fmt.Printf("Failed to execute assets/static/stats.html %v\n", err)
-	}
-}
-
-var scenarioTpl = template.Must(template.ParseFiles("assets/static/scenario.html"))
-
-func (s *serverState) scenarioHandler(w http.ResponseWriter, r *http.Request) {
-	err := scenarioTpl.Execute(w, s.GameStates[0].Scenario)
-	if err != nil {
-		fmt.Printf("Failed to execute assets/static/scenario.html %v\n", err)
-	}
-}
-
 var gameStateElementsTpl = template.Must(template.ParseFiles("assets/static/gameStateElements.html"))
 
 func (s *serverState) gameStateElementsHandler(w http.ResponseWriter, r *http.Request) {
@@ -130,8 +112,6 @@ func main() {
 	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
 
 	http.HandleFunc("/", mainServerState.indexHandler)
-	http.HandleFunc("/stats", mainServerState.statsHandler)
-	http.HandleFunc("/scenario", mainServerState.scenarioHandler)
 	http.HandleFunc("/gameStateElements", mainServerState.gameStateElementsHandler)
 	http.HandleFunc("/left", mainServerState.leftHandler)
 	http.HandleFunc("/right", mainServerState.rightHandler)
