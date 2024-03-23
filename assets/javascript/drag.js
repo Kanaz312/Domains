@@ -1,6 +1,7 @@
 // Modified from https://www.kirupa.com/html5/drag.htm
 
 var dragItem = document.querySelector("#top-card");
+var cardBack = document.querySelector("#top-card-back");
 var container = document.querySelector("#top-card-container");
 var leftAnswer = document.querySelector("#answer-left");
 var rightAnswer = document.querySelector("#answer-right");
@@ -13,6 +14,13 @@ container.addEventListener("touchmove", drag, false);
 container.addEventListener("mousedown", dragStart, false);
 container.addEventListener("mouseup", dragEnd, false);
 container.addEventListener("mousemove", drag, false);
+
+setTimeout(() => {
+	dragItem.style.transform = "rotateY(0deg)";
+	dragItem.style.transition = "0.5s ease-in-out";
+	cardBack.style.transform = "rotateY(180deg)";
+	cardBack.style.transition = "0.5s ease-in-out";
+}, 100)
 
 // Returns -1 for left, 0 for neutral, 1 for right
 function getSide(x) {
@@ -32,38 +40,57 @@ function dragStart(e) {
 	}
 
 	dragItem.style.transition = "";
+	cardBack.style.transition = "";
 }
 
 function dragEnd(e) {
-	setTranslate(0, 0, dragItem);
 	dragItem.style.transition = "0.4s ease-out";
 	active = false;
 
 	let sentRequest = false;
 
 	let x = 0.0;
+	let y = 0.0;
 	if (e.type === "touchend") {
 		x = e.touches[0].clientX;
+		y = e.touches[0].clientY;
 	} else {
 		x = e.clientX;
+		y = e.clientY;
 	}
 
 	let side = getSide(x);
+
+	let boundingRect = container.getBoundingClientRect()
+	let finalX = 0.0;
+	let finalY = y - boundingRect.y - (boundingRect.height / 2);
 
 	if (side == -1) {
 		fetch("http://localhost:8080/left", {method : "post"});
 		htmx.trigger("#scenario", "game-state-update");
 		sentRequest = true;
-	}
-	else if (side === 1) {
+		finalX = -boundingRect.x - boundingRect.height;
+		setTranslate(finalX, finalY, dragItem);
+	} else if (side === 1) {
 		fetch("http://localhost:8080/right", {method : "post"});
 		htmx.trigger("#scenario", "game-state-update");
 		sentRequest = true;
+		finalX = window.innerWidth - boundingRect.x + boundingRect.height;
+		setTranslate(finalX, finalY, dragItem);
+	} else if (side === 0) {
+		setTranslate(0.0, 0.0, dragItem);
 	}
+
+	setTimeout(() => {
+		dragItem.style.transition = "";
+		cardBack.style.transition = "";
+	},
+		400);
 
 	if (sentRequest) {
 		leftAnswer.removeAttribute("style");
 		rightAnswer.removeAttribute("style");
+
 	}
 }
 
