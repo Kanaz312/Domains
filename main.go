@@ -1,9 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 )
 
@@ -56,39 +56,43 @@ func (s *serverState) gameStateElementsHandler(w http.ResponseWriter, r *http.Re
 	}
 }
 
-func (s *serverState) leftHandler(w http.ResponseWriter, r *http.Request) {
-	currentGameState := &s.GameStates[0]
-	currentScenario := currentGameState.Scenario
-	
-	currentGameState.Cross += currentScenario.LeftDecision.Cross
-	currentGameState.Population += currentScenario.LeftDecision.Population
-	currentGameState.Sword += currentScenario.LeftDecision.Sword
-	currentGameState.Money += currentScenario.LeftDecision.Money
-
-	currentGameState.ScenarioIndex = (currentGameState.ScenarioIndex + 1) % len(s.Scenarios)
-	currentGameState.Scenario = s.Scenarios[currentGameState.ScenarioIndex]
-	log.Printf("%v", currentGameState.Scenario)
-
-	w.WriteHeader(http.StatusAccepted)
-	w.Write([]byte("200 - Left Received"))
-	log.Printf("Handled left, new stats: %d %d %d %d\n", currentGameState.Cross, currentGameState.Population, currentGameState.Sword, currentGameState.Money)
+type decisionRequest struct {
+	Choice int `json:"decision"`
 }
 
-func (s *serverState) rightHandler(w http.ResponseWriter, r *http.Request) {
+func (s *serverState) decisionHandler(w http.ResponseWriter, r *http.Request) {
 	currentGameState := &s.GameStates[0]
 	currentScenario := currentGameState.Scenario
 	
-	currentGameState.Cross += currentScenario.RightDecision.Cross
-	currentGameState.Population += currentScenario.RightDecision.Population
-	currentGameState.Sword += currentScenario.RightDecision.Sword
-	currentGameState.Money += currentScenario.RightDecision.Money
+	var choice decisionRequest
+	json.NewDecoder(r.Body).Decode(&choice)
 
-	currentGameState.ScenarioIndex = (currentGameState.ScenarioIndex + 1) % len(s.Scenarios)
-	currentGameState.Scenario = s.Scenarios[currentGameState.ScenarioIndex]
+	if (choice.Choice == -1) {
+		currentGameState.Cross += currentScenario.LeftDecision.Cross
+		currentGameState.Population += currentScenario.LeftDecision.Population
+		currentGameState.Sword += currentScenario.LeftDecision.Sword
+		currentGameState.Money += currentScenario.LeftDecision.Money
 
-	w.WriteHeader(http.StatusAccepted)
-	w.Write([]byte("200 - Right Received"))
-	log.Printf("Handled right, new stats: %d %d %d %d\n", currentGameState.Cross, currentGameState.Population, currentGameState.Sword, currentGameState.Money)
+		currentGameState.ScenarioIndex = (currentGameState.ScenarioIndex + 1) % len(s.Scenarios)
+		currentGameState.Scenario = s.Scenarios[currentGameState.ScenarioIndex]
+
+		w.WriteHeader(http.StatusAccepted)
+		w.Write([]byte("200 - Left Received"))
+	} else if (choice.Choice == 1) {
+		currentGameState.Cross += currentScenario.RightDecision.Cross
+		currentGameState.Population += currentScenario.RightDecision.Population
+		currentGameState.Sword += currentScenario.RightDecision.Sword
+		currentGameState.Money += currentScenario.RightDecision.Money
+
+		currentGameState.ScenarioIndex = (currentGameState.ScenarioIndex + 1) % len(s.Scenarios)
+		currentGameState.Scenario = s.Scenarios[currentGameState.ScenarioIndex]
+
+		w.WriteHeader(http.StatusAccepted)
+		w.Write([]byte("200 - Right Received"))
+	} else {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Uknown decision value"))
+	}
 }
 
 func main() {
@@ -113,8 +117,7 @@ func main() {
 
 	http.HandleFunc("/", mainServerState.indexHandler)
 	http.HandleFunc("/gameStateElements", mainServerState.gameStateElementsHandler)
-	http.HandleFunc("/left", mainServerState.leftHandler)
-	http.HandleFunc("/right", mainServerState.rightHandler)
+	http.HandleFunc("/decide", mainServerState.decisionHandler)
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		fmt.Printf("Failed to listen and start %v\n", err)

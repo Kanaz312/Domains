@@ -65,16 +65,18 @@ function dragEnd(e) {
 	let finalX = 0.0;
 	let finalY = y - boundingRect.y - (boundingRect.height / 2);
 
-	if (side == -1) {
-		fetch("http://localhost:8080/left", {method : "post"});
+	if (side !== 0)
+	{
+		fetch("http://localhost:8080/decide", {method : "post", body : JSON.stringify({decision : side})});
 		htmx.trigger("#scenario", "game-state-update");
-		sentRequest = true;
+		leftAnswer.removeAttribute("style");
+		rightAnswer.removeAttribute("style");
+	}
+
+	if (side === -1) {
 		finalX = -boundingRect.x - boundingRect.height;
 		setTranslate(finalX, finalY, dragItem);
 	} else if (side === 1) {
-		fetch("http://localhost:8080/right", {method : "post"});
-		htmx.trigger("#scenario", "game-state-update");
-		sentRequest = true;
 		finalX = window.innerWidth - boundingRect.x + boundingRect.height;
 		setTranslate(finalX, finalY, dragItem);
 	} else if (side === 0) {
@@ -86,12 +88,6 @@ function dragEnd(e) {
 		cardBack.style.transition = "";
 	},
 		400);
-
-	if (sentRequest) {
-		leftAnswer.removeAttribute("style");
-		rightAnswer.removeAttribute("style");
-
-	}
 }
 
 function drag(e) {
