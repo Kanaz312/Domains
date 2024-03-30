@@ -31,7 +31,7 @@ func (s *ServerState) makeSession() (int, http.Cookie) {
 		SameSite: http.SameSiteLaxMode,
 	}
 
-	sampleState := game.Game{Cross: 50, Population: 50, Sword: 50, Money: 50, GameScenario: s.Scenarios[0], ScenarioIndex: 0}
+	sampleState := game.Game{Cross: 50, Population: 50, Sword: 50, Money: 50, Scenario: s.Scenarios[0], ScenarioIndex: 0}
 	s.GameStates = append(s.GameStates, sampleState)
 
 	s.CookieIndex++
@@ -118,7 +118,7 @@ func (s *ServerState) DecisionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	currentGameState := &s.GameStates[index]
-	currentScenario := currentGameState.GameScenario
+	currentScenario := currentGameState.Scenario
 	
 	var choice decisionRequest
 	json.NewDecoder(r.Body).Decode(&choice)
@@ -130,7 +130,7 @@ func (s *ServerState) DecisionHandler(w http.ResponseWriter, r *http.Request) {
 		currentGameState.Money += currentScenario.LeftDecision.Money
 
 		currentGameState.ScenarioIndex = (currentGameState.ScenarioIndex + 1) % len(s.Scenarios)
-		currentGameState.GameScenario = s.Scenarios[currentGameState.ScenarioIndex]
+		currentGameState.Scenario = s.Scenarios[currentGameState.ScenarioIndex]
 
 		w.WriteHeader(http.StatusAccepted)
 		w.Write([]byte("200 - Left Received"))
@@ -141,7 +141,7 @@ func (s *ServerState) DecisionHandler(w http.ResponseWriter, r *http.Request) {
 		currentGameState.Money += currentScenario.RightDecision.Money
 
 		currentGameState.ScenarioIndex = (currentGameState.ScenarioIndex + 1) % len(s.Scenarios)
-		currentGameState.GameScenario = s.Scenarios[currentGameState.ScenarioIndex]
+		currentGameState.Scenario = s.Scenarios[currentGameState.ScenarioIndex]
 
 		w.WriteHeader(http.StatusAccepted)
 		w.Write([]byte("200 - Right Received"))

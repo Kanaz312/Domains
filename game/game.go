@@ -9,6 +9,6 @@ type Game struct {
 	Population int;
 	Sword int;
 	Money int;
-	GameScenario scenario.Scenario;
+	Scenario scenario.Scenario;
 	ScenarioIndex int;
 }
