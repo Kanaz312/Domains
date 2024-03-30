@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"goobl/game"
-	"goobl/scenarios"
+	"goobl/scenario"
 	"log"
 	"net/http"
 	"strconv"
@@ -62,7 +62,7 @@ func (s *ServerState) IndexHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	
-	if err := indexTpl.Execute(w, s.GameStates[index]); err != nil {
+	if err := indexTpl.Execute(w, nil); err != nil {
 		fmt.Printf("Failed to execute index.html %v\n", err)
 	}
 }
@@ -96,11 +96,32 @@ func (s *ServerState) getUserSession(w http.ResponseWriter, r *http.Request) (in
 	}
 }
 
+type gameStateElements struct{
+	Cross int;
+	Population int;
+	Sword int;
+	Money int;
+	Prompt string;
+	Image string;
+	LeftDescription string;
+	RightDescription string;
+}
+
 var gameStateElementsTpl = template.Must(template.ParseFiles("assets/static/gameStateElements.html"))
 
 func (s *ServerState) GameStateElementsHandler(w http.ResponseWriter, r *http.Request) {
 	if index, err := s.getUserSession(w, r); err == nil {
-		err := gameStateElementsTpl.Execute(w, s.GameStates[index])
+		state := s.GameStates[index]
+		data := gameStateElements{
+			state.Cross,
+			state.Population,
+			state.Sword,
+			state.Money,
+			state.Scenario.Prompt,
+			state.Scenario.Image,
+			state.Scenario.Decisions[0].Description,
+			state.Scenario.Decisions[1].Description}
+		err := gameStateElementsTpl.Execute(w, data)
 		if err != nil {
 			fmt.Printf("Failed to execute assets/static/gameStateElements.html %v\n", err)
 			http.Error(w, "server error", http.StatusInternalServerError)
@@ -123,30 +144,30 @@ func (s *ServerState) DecisionHandler(w http.ResponseWriter, r *http.Request) {
 	var choice decisionRequest
 	json.NewDecoder(r.Body).Decode(&choice)
 
+	decisionIndex := 0
 	if (choice.Choice == -1) {
-		currentGameState.Cross += currentScenario.LeftDecision.Cross
-		currentGameState.Population += currentScenario.LeftDecision.Population
-		currentGameState.Sword += currentScenario.LeftDecision.Sword
-		currentGameState.Money += currentScenario.LeftDecision.Money
-
-		currentGameState.ScenarioIndex = (currentGameState.ScenarioIndex + 1) % len(s.Scenarios)
-		currentGameState.Scenario = s.Scenarios[currentGameState.ScenarioIndex]
+		decisionIndex = 0
 
 		w.WriteHeader(http.StatusAccepted)
 		w.Write([]byte("200 - Left Received"))
 	} else if (choice.Choice == 1) {
-		currentGameState.Cross += currentScenario.RightDecision.Cross
-		currentGameState.Population += currentScenario.RightDecision.Population
-		currentGameState.Sword += currentScenario.RightDecision.Sword
-		currentGameState.Money += currentScenario.RightDecision.Money
-
-		currentGameState.ScenarioIndex = (currentGameState.ScenarioIndex + 1) % len(s.Scenarios)
-		currentGameState.Scenario = s.Scenarios[currentGameState.ScenarioIndex]
+		decisionIndex = 1
 
 		w.WriteHeader(http.StatusAccepted)
 		w.Write([]byte("200 - Right Received"))
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Uknown decision value"))
+		return
 	}
+
+	decision := currentScenario.Decisions[decisionIndex];
+	currentGameState.Cross += decision.Cross
+	currentGameState.Population += decision.Population
+	currentGameState.Sword += decision.Sword
+	currentGameState.Money += decision.Money
+
+	currentGameState.ScenarioIndex = (currentGameState.ScenarioIndex + 1) % len(s.Scenarios)
+	currentGameState.Scenario = s.Scenarios[currentGameState.ScenarioIndex]
+
 }

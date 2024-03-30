@@ -1,7 +1,7 @@
 package game
 
 import (
-	"goobl/scenarios"
+	"goobl/scenario"
 )
 
 type Game struct {
