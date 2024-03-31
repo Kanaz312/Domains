@@ -21,46 +21,36 @@ var Scenarios []Scenario
 func init() {
 	Scenarios = []Scenario{
 		{
-			Prompt: "We would like to construct a cathedral to spread the Good Word",
-			Image: "jack",
+			Prompt: "I heard you've been feeling down. I'll throw a show for you!",
+			Image: "BaseGoobl",
 			Decisions: 
 			[2]Decision{
-				{30, 10, 0, -40, "Build the church"},
-				{-20, 0, 0, 10, "No good, costs too much"}},
+				{0, 0, 0, 0, "Awww, thanks!"},
+				{0, 0, 0, 0, "I'm guessing I have no choice..."}},
 		},
 		{
-			Prompt: "The people are going hungry",
-			Image: "queen",
+			Prompt: "What spell should we learn first?",
+			Image: "MagicGoobl",
 			Decisions: 
 			[2]Decision{
-				{-10, 40, 0, -10, "Clear the forests to make new farmland"},
-				{0, 30, -30, 0, "Steal from our neighbors"}},
+				{0, 0, 30, 0, "Fireballl for the big boom!"},
+				{0, 30, 0, 0, "Create food, so we can have some snacks!"}},
 		},
 		{
-			Prompt: "2",
-			Image: "ace",
+			Prompt: "Would you like to buy some wares?",
+			Image: "MerchantGoobl",
 			Decisions: 
 			[2]Decision{
-				{0, 0, 0, 0,"#"},
-				{0, 0, 0, 0,"#"}},
+				{20, 0, 0, -20,"These shells look neat! Could be nice for a ritual"},
+				{0, 10, 0, 10,"I'll sell this cookie I have, if you'd like"}},
 		},
 		{
-			Prompt: "3",
-			Image: "king",
+			Prompt: "There are beetles attacking us!",
+			Image: "KnightGoobl",
 			Decisions: 
 			[2]Decision{
-				{0, 0, 0, 0,"#"},
-				{0, 0, 0, 0,"#"}},
-		},
-		{
-			Prompt: "4",
-			Image: "ace",
-			Decisions: 
-			[2]Decision{
-				{0, 0, 0, 0,"#"},
-				{0, 0, 0, 0,"#"}},
+				{0, 0, -30, 0,"Smash them, Goobl!"},
+				{0, -30, 0, 0,"RUN AWAYYYYYYY!"}},
 		},
 	}
-
-
 }
