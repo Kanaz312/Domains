@@ -2,15 +2,14 @@ package main
 
 import (
 	"fmt"
-	"goobl/game"
-	"goobl/scenario"
 	"goobl/server"
 	"net/http"
 )
 
 
 func main() {
-	mainServerState := server.ServerState{GameStates: make([]game.Game, 0, 5), Scenarios: scenario.Scenarios, CookieIndex: 0}
+	mainServerState := server.ServerState{}
+	mainServerState.InitializeServer()
 
 	fs := http.FileServer(http.Dir("assets"))
 

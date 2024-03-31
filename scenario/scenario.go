@@ -14,20 +14,10 @@ type Scenario struct {
 	Decisions [2]Decision;
 }
 
-
 var Scenarios []Scenario
-
 
 func init() {
 	Scenarios = []Scenario{
-		{
-			Prompt: "I heard you've been feeling down. I'll throw a show for you!",
-			Image: "BaseGoobl",
-			Decisions: 
-			[2]Decision{
-				{0, 0, 0, 0, "Awww, thanks!"},
-				{0, 0, 0, 0, "I'm guessing I have no choice..."}},
-		},
 		{
 			Prompt: "What spell should we learn first?",
 			Image: "MagicGoobl",
