@@ -19,10 +19,10 @@ type user struct {
 	Token int64
 }
 
-var maxUsers = 10000
+const maxUsers = 1000000
 
 type ServerState struct {
-	Users [10000]user;
+	Users []user;
 	Scenarios []scenario.Scenario;
 	NumUsers int;
 }
@@ -220,6 +220,7 @@ func (s *ServerState) DecisionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *ServerState) InitializeServer() {
+	s.Users = make([]user, maxUsers)
 	for i := 0; i < len(s.Users); i++ {
 		u := &s.Users[i]
 		u.State = game.Game{Cross: 50, Population: 50, Sword: 50, Money: 50, ScenarioIndex: 0}
