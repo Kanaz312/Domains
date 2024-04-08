@@ -1,7 +1,7 @@
 package game
 
 type Game struct {
-	Cross int;
+	Magic int;
 	Population int;
 	Sword int;
 	Money int;

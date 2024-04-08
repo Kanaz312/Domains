@@ -143,7 +143,7 @@ func (s *ServerState) getUserSession(w http.ResponseWriter, r *http.Request) (in
 }
 
 type gameStateElements struct{
-	Cross int;
+	Magic int;
 	Population int;
 	Sword int;
 	Money int;
@@ -160,7 +160,7 @@ func (s *ServerState) GameStateElementsHandler(w http.ResponseWriter, r *http.Re
 		state := s.Users[index].State
 		scenario := s.Scenarios[state.ScenarioIndex]
 		data := gameStateElements{
-			state.Cross,
+			state.Magic,
 			state.Population,
 			state.Sword,
 			state.Money,
@@ -211,7 +211,7 @@ func (s *ServerState) DecisionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	decision := currentScenario.Decisions[decisionIndex];
-	currentGameState.Cross += decision.Cross
+	currentGameState.Magic += decision.Magic
 	currentGameState.Population += decision.Population
 	currentGameState.Sword += decision.Sword
 	currentGameState.Money += decision.Money
@@ -223,7 +223,7 @@ func (s *ServerState) InitializeServer() {
 	s.Users = make([]user, maxUsers)
 	for i := 0; i < len(s.Users); i++ {
 		u := &s.Users[i]
-		u.State = game.Game{Cross: 50, Population: 50, Sword: 50, Money: 50, ScenarioIndex: 0}
+		u.State = game.Game{Magic: 50, Population: 50, Sword: 50, Money: 50, ScenarioIndex: 0}
 		u.Token = rand.Int64()
 	}
 	
@@ -237,8 +237,8 @@ func (s *ServerState) InitializeServer() {
 		Image: "BaseGoobl",
 		Decisions: 
 		[2]scenario.Decision{
-			{Cross: 0, Population: 0, Sword: 0, Money: 0, Description: "Awww, thanks!"},
-			{Cross: 0, Population: 0, Sword: 0, Money: 0, Description: "I'm guessing I have no choice..."}},
+			{Magic: 0, Population: 0, Sword: 0, Money: 0, Description: "Awww, thanks!"},
+			{Magic: 0, Population: 0, Sword: 0, Money: 0, Description: "I'm guessing I have no choice..."}},
 		}
 
 	s.Scenarios = slices.Insert(s.Scenarios, 0, startScenario)

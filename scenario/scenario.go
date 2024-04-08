@@ -1,7 +1,7 @@
 package scenario
 
 type Decision struct {
-	Cross int;
+	Magic int;
 	Population int;
 	Sword int;
 	Money int;
