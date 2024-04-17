@@ -12,6 +12,7 @@ import (
 	"slices"
 	"strconv"
 	"text/template"
+	"time"
 )
 
 type user struct {
@@ -36,20 +37,29 @@ func (e *sessionCreationError) Error() string {
 
 var sessionTokenName = "session"
 
+func CalculateTomorrow() time.Time {
+		now := time.Now()
+		yyyy, mm, dd := now.Date()
+		return time.Date(yyyy, mm, dd+1, 0, 0, 0, 0, now.Location())
+}
+
 func (s *ServerState) makeSession() (http.Cookie, error) {
 	if s.NumUsers >= maxUsers {
 		return http.Cookie{}, &sessionCreationError{}
 	} else {
 		token := s.Users[s.NumUsers].Token
 		cookieValue := fmt.Sprintf("%d", token)
+		tomorrow := CalculateTomorrow()
+		secondsToTomorrow := int(time.Until(tomorrow).Seconds())
 
-		newSessionCookie := http.Cookie {
-			Name: sessionTokenName,
-			Value: cookieValue,
-
-			Secure: true,
-			HttpOnly: true,
-			SameSite: http.SameSiteLaxMode,
+		newSessionCookie := http.Cookie{
+			Name:       sessionTokenName,
+			Value:      cookieValue,
+			Expires:    tomorrow,
+			MaxAge:     secondsToTomorrow,
+			Secure:     true,
+			HttpOnly:   true,
+			SameSite:   http.SameSiteLaxMode,
 		}
 
 		s.NumUsers++
@@ -62,7 +72,7 @@ func (s *ServerState) deleteSession(w http.ResponseWriter) {
 	deleteCookie := http.Cookie {
 		Name: sessionTokenName,
 		Value: "",
-
+		Expires:    time.Now(),
 		MaxAge: -1,
 		Secure: true,
 		HttpOnly: true,
@@ -118,10 +128,7 @@ func (s *ServerState) findUser(token int64) int {
 
 func (s *ServerState) getUserSession(w http.ResponseWriter, r *http.Request) (int, error) {
 	if cookie, err := r.Cookie(sessionTokenName); err != nil {
-		switch {
-		case errors.Is(err, http.ErrNoCookie):
-			http.Error(w, "session token not found", http.StatusBadRequest)
-		default:
+		if !errors.Is(err, http.ErrNoCookie) {
 			log.Println(err)
 			http.Error(w, "server error", http.StatusInternalServerError)
 		}

@@ -1,26 +1,61 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"goobl/server"
+	"log"
 	"net/http"
+	"time"
 )
 
+func startServer(goServer *http.Server){
+	if err := goServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("ListenAndServe failed: %v", err)
+	}
+
+}
+
+func shutdownServer(goServer *http.Server){
+	ctx, cancel := context.WithTimeout(context.Background(), 5 * time.Second)
+	defer cancel()
+	if err := goServer.Shutdown(ctx); err != nil {
+		log.Fatalf("Server shutdown failed: %v", err)
+	}
+}
 
 func main() {
 	mainServerState := server.ServerState{}
-	mainServerState.InitializeServer()
+
+	mux := http.NewServeMux()
 
 	fs := http.FileServer(http.Dir("assets"))
+	mux.Handle("/assets/", http.StripPrefix("/assets/", fs))
+	mux.HandleFunc("/", mainServerState.IndexHandler)
+	mux.HandleFunc("/gameStateElements", mainServerState.GameStateElementsHandler)
+	mux.HandleFunc("/decide", mainServerState.DecisionHandler)
+	mux.HandleFunc("/results", mainServerState.ResultsHandler)
 
-	http.Handle("/assets/", http.StripPrefix("/assets/", fs))
+	for {
+		mainServerState.InitializeServer()
 
-	http.HandleFunc("/", mainServerState.IndexHandler)
-	http.HandleFunc("/gameStateElements", mainServerState.GameStateElementsHandler)
-	http.HandleFunc("/decide", mainServerState.DecisionHandler)
-	http.HandleFunc("/results", mainServerState.ResultsHandler)
+		goServer := &http.Server{
+			Addr:                         ":8080",
+			Handler:                      mux,
+			DisableGeneralOptionsHandler: false,
+			ReadTimeout:                  10 * time.Second,
+			ReadHeaderTimeout:            10 * time.Second,
+			WriteTimeout:                 10 * time.Second,
+			IdleTimeout:                  0,
+			MaxHeaderBytes:               1 << 20,
+		}
 
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		fmt.Printf("Failed to listen and start %v\n", err)
+		go startServer(goServer)
+
+		tomorrow := server.CalculateTomorrow()
+		time.Sleep(time.Until(tomorrow))
+
+		shutdownServer(goServer)
+
+		log.Print("Re-initializing server...")
 	}
 }
