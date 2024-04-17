@@ -15,6 +15,7 @@ type Scenario struct {
 }
 
 var Scenarios []Scenario
+var DeathScenarios []Scenario
 
 func init() {
 	Scenarios = []Scenario{
@@ -41,6 +42,72 @@ func init() {
 			[2]Decision{
 				{0, 0, -30, 0,"Smash them, Goobl!"},
 				{0, -30, 0, 0,"RUN AWAYYYYYYY!"}},
+		},
+	}
+	DeathScenarios = []Scenario{
+		{
+			Prompt: "This story got too booooooring",
+			Image: "MagicGoobl",
+			Decisions:
+			[2]Decision{
+				{0, 0, 0, 0, "What....?"},
+				{0, 0, 0, 0, "What....?"}},
+		},
+		{
+			Prompt: "HEHEHEHEHE I BECAME GOD",
+			Image: "MagicGoobl",
+			Decisions:
+			[2]Decision{
+				{0, 0, 0, 0, "What....?"},
+				{0, 0, 0, 0, "What....?"}},
+		},
+		{
+			Prompt: "You haven't been very nice in this story",
+			Image: "BaseGoobl",
+			Decisions:
+			[2]Decision{
+				{0, 0, 0, 0, "What....?"},
+				{0, 0, 0, 0, "What....?"}},
+		},
+		{
+			Prompt: "Things are tooo crowded now",
+			Image: "BaseGoobl",
+			Decisions:
+			[2]Decision{
+				{0, 0, 0, 0, "What....?"},
+				{0, 0, 0, 0, "What....?"}},
+		},
+		{
+			Prompt: "They aren't strong enough in this story",
+			Image: "KnightGoobl",
+			Decisions:
+			[2]Decision{
+				{0, 0, 0, 0, "What....?"},
+				{0, 0, 0, 0, "What....?"}},
+		},
+		{
+			Prompt: "There's too much fighting for me",
+			Image: "KnightGoobl",
+			Decisions:
+			[2]Decision{
+				{0, 0, 0, 0, "What....?"},
+				{0, 0, 0, 0, "What....?"}},
+		},
+		{
+			Prompt: "The characters should've had more cool things",
+			Image: "MerchantGoobl",
+			Decisions:
+			[2]Decision{
+				{0, 0, 0, 0, "What....?"},
+				{0, 0, 0, 0, "What....?"}},
+		},
+		{
+			Prompt: "Hehehehe sooooooooo many shiny things",
+			Image: "MerchantGoobl",
+			Decisions:
+			[2]Decision{
+				{0, 0, 0, 0, "What....?"},
+				{0, 0, 0, 0, "What....?"}},
 		},
 	}
 }

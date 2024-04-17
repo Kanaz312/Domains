@@ -153,25 +153,62 @@ type gameStateElements struct{
 	RightDescription string;
 }
 
+var deadTpl = template.Must(template.ParseFiles("assets/static/dead.html"))
 var gameStateElementsTpl = template.Must(template.ParseFiles("assets/static/gameStateElements.html"))
+
+func (s *ServerState) populateDeadElements(w http.ResponseWriter, state *game.Game) {
+	scene := state.GetDeathScenario()
+	if scene == nil {
+		http.Error(w, "server error", http.StatusInternalServerError)
+		return
+	}
+
+	data := gameStateElements{
+		state.Magic,
+		state.Population,
+		state.Sword,
+		state.Money,
+		scene.Prompt,
+		scene.Image,
+		scene.Decisions[0].Description,
+		scene.Decisions[1].Description,
+	}
+
+	if err:= deadTpl.Execute(w, data); err != nil {
+		fmt.Printf("Failed to execute assets/static/dead.html %v\n", err)
+		http.Error(w, "server error", http.StatusInternalServerError)
+	}
+}
+
+func (s *ServerState) populateLivingElements(w http.ResponseWriter, state *game.Game) {
+	scene := &s.Scenarios[state.ScenarioIndex]
+
+	data := gameStateElements{
+		state.Magic,
+		state.Population,
+		state.Sword,
+		state.Money,
+		scene.Prompt,
+		scene.Image,
+		scene.Decisions[0].Description,
+		scene.Decisions[1].Description,
+	}
+
+	err := gameStateElementsTpl.Execute(w, data)
+	if err != nil {
+		fmt.Printf("Failed to execute assets/static/gameStateElements.html %v\n", err)
+		http.Error(w, "server error", http.StatusInternalServerError)
+	}
+
+}
 
 func (s *ServerState) GameStateElementsHandler(w http.ResponseWriter, r *http.Request) {
 	if index, err := s.getUserSession(w, r); err == nil {
-		state := s.Users[index].State
-		scenario := s.Scenarios[state.ScenarioIndex]
-		data := gameStateElements{
-			state.Magic,
-			state.Population,
-			state.Sword,
-			state.Money,
-			scenario.Prompt,
-			scenario.Image,
-			scenario.Decisions[0].Description,
-			scenario.Decisions[1].Description}
-		err := gameStateElementsTpl.Execute(w, data)
-		if err != nil {
-			fmt.Printf("Failed to execute assets/static/gameStateElements.html %v\n", err)
-			http.Error(w, "server error", http.StatusInternalServerError)
+		state := &s.Users[index].State
+		if state.IsDead() {
+			s.populateDeadElements(w, state)
+		} else {
+			s.populateLivingElements(w, state)
 		}
 	} else {
 		w.Header().Add("HX-Redirect", "/")
@@ -196,13 +233,9 @@ func (s *ServerState) DecisionHandler(w http.ResponseWriter, r *http.Request) {
 	decisionIndex := 0
 	if (choice.Choice == -1) {
 		decisionIndex = 0
-
-		w.WriteHeader(http.StatusAccepted)
 		w.Write([]byte("200 - Left Received"))
 	} else if (choice.Choice == 1) {
 		decisionIndex = 1
-
-		w.WriteHeader(http.StatusAccepted)
 		w.Write([]byte("200 - Right Received"))
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
@@ -210,13 +243,17 @@ func (s *ServerState) DecisionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	decision := currentScenario.Decisions[decisionIndex];
-	currentGameState.Magic += decision.Magic
-	currentGameState.Population += decision.Population
-	currentGameState.Sword += decision.Sword
-	currentGameState.Money += decision.Money
+	currentGameState.ApplyDecision(&currentScenario.Decisions[decisionIndex], s.Scenarios)
+}
 
-	currentGameState.ScenarioIndex = (currentGameState.ScenarioIndex + 1) % len(s.Scenarios)
+var resultsTpl = template.Must(template.ParseFiles("assets/static/results.html"))
+
+func (s *ServerState) ResultsHandler(w http.ResponseWriter, r *http.Request) {
+	err := resultsTpl.Execute(w, nil)
+	if err != nil {
+		fmt.Printf("Failed to execute assets/static/results.html %v\n", err)
+		http.Error(w, "server error", http.StatusInternalServerError)
+	}
 }
 
 func (s *ServerState) InitializeServer() {

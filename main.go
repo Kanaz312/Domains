@@ -18,6 +18,7 @@ func main() {
 	http.HandleFunc("/", mainServerState.IndexHandler)
 	http.HandleFunc("/gameStateElements", mainServerState.GameStateElementsHandler)
 	http.HandleFunc("/decide", mainServerState.DecisionHandler)
+	http.HandleFunc("/results", mainServerState.ResultsHandler)
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		fmt.Printf("Failed to listen and start %v\n", err)
