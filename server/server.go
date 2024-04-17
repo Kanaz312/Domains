@@ -151,64 +151,62 @@ type gameStateElements struct{
 	Image string;
 	LeftDescription string;
 	RightDescription string;
+	ReloadEndpoint string;
 }
 
-var deadTpl = template.Must(template.ParseFiles("assets/static/dead.html"))
 var gameStateElementsTpl = template.Must(template.ParseFiles("assets/static/gameStateElements.html"))
 
-func (s *ServerState) populateDeadElements(w http.ResponseWriter, state *game.Game) {
+func (s *ServerState) populateDeadElements(state *game.Game, data *gameStateElements) error {
 	scene := state.GetDeathScenario()
 	if scene == nil {
-		http.Error(w, "server error", http.StatusInternalServerError)
-		return
+		return errors.New("Failed to get death scenario")
 	}
 
-	data := gameStateElements{
-		state.Magic,
-		state.Population,
-		state.Sword,
-		state.Money,
-		scene.Prompt,
-		scene.Image,
-		scene.Decisions[0].Description,
-		scene.Decisions[1].Description,
-	}
+	data.Magic = state.Magic
+	data.Population = state.Population
+	data.Sword = state.Sword
+	data.Money = state.Money
+	data.Prompt = scene.Prompt
+	data.Image = scene.Image
+	data.LeftDescription = scene.Decisions[0].Description
+	data.RightDescription = scene.Decisions[1].Description
+	data.ReloadEndpoint = "results"
 
-	if err:= deadTpl.Execute(w, data); err != nil {
-		fmt.Printf("Failed to execute assets/static/dead.html %v\n", err)
-		http.Error(w, "server error", http.StatusInternalServerError)
-	}
+	return nil
 }
 
-func (s *ServerState) populateLivingElements(w http.ResponseWriter, state *game.Game) {
+func (s *ServerState) populateLivingElements(state *game.Game, data *gameStateElements) {
 	scene := &s.Scenarios[state.ScenarioIndex]
 
-	data := gameStateElements{
-		state.Magic,
-		state.Population,
-		state.Sword,
-		state.Money,
-		scene.Prompt,
-		scene.Image,
-		scene.Decisions[0].Description,
-		scene.Decisions[1].Description,
-	}
-
-	err := gameStateElementsTpl.Execute(w, data)
-	if err != nil {
-		fmt.Printf("Failed to execute assets/static/gameStateElements.html %v\n", err)
-		http.Error(w, "server error", http.StatusInternalServerError)
-	}
-
+	data.Magic = state.Magic
+	data.Population = state.Population
+	data.Sword = state.Sword
+	data.Money = state.Money
+	data.Prompt = scene.Prompt
+	data.Image = scene.Image
+	data.LeftDescription = scene.Decisions[0].Description
+	data.RightDescription = scene.Decisions[1].Description
+	data.ReloadEndpoint = "gameStateElements"
 }
 
 func (s *ServerState) GameStateElementsHandler(w http.ResponseWriter, r *http.Request) {
 	if index, err := s.getUserSession(w, r); err == nil {
 		state := &s.Users[index].State
+		data := gameStateElements{}
+
 		if state.IsDead() {
-			s.populateDeadElements(w, state)
+			if err = s.populateDeadElements(state, &data); err != nil {
+				http.Error(w, "server error", http.StatusInternalServerError)
+				return
+			}
 		} else {
-			s.populateLivingElements(w, state)
+			s.populateLivingElements(state, &data)
+		}
+
+		err := gameStateElementsTpl.Execute(w, data)
+		if err != nil {
+			fmt.Printf("Failed to execute assets/static/gameStateElements.html %v\n", err)
+			http.Error(w, "server error", http.StatusInternalServerError)
 		}
 	} else {
 		w.Header().Add("HX-Redirect", "/")

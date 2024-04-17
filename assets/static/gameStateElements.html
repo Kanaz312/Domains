@@ -16,7 +16,7 @@
 		<progress id="money-bar" class="stat-bar" value="{{ .Money }}" max="100"></progress>
 	</div>
 </div>
-<div id="scenario" hx-get="/gameStateElements" hx-trigger="game-state-update" hx-target="body" hx-swap="innerHTML swap:0.4s">
+<div id="scenario" hx-get="/{{ .ReloadEndpoint }}" hx-trigger="game-state-update" hx-target="body" hx-swap="innerHTML swap:0.4s">
 	<div class="scenario-element" id="promt">
 		{{ .Prompt }}
 	</div>
