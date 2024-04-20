@@ -52,8 +52,8 @@ function dragEnd(e) {
 	let x = 0.0;
 	let y = 0.0;
 	if (e.type === "touchend") {
-		x = e.touches[0].clientX;
-		y = e.touches[0].clientY;
+		x = e.changedTouches[0].clientX;
+		y = e.changedTouches[0].clientY;
 	} else {
 		x = e.clientX;
 		y = e.clientY;
@@ -115,8 +115,13 @@ function drag(e) {
 			rightAnswer.style.display = "none";
 		}
 
-		let boundingRect = container.getBoundingClientRect()
-		x -= boundingRect.x + (boundingRect.width / 2);
+		let boundingRect = container.getBoundingClientRect();
+		let rectHalfWidth = boundingRect.width / 2;
+
+		let w = window.innerWidth;
+		x = Math.min(Math.max(x, rectHalfWidth), w - rectHalfWidth);
+
+		x -= boundingRect.x + (rectHalfWidth);
 		y -= boundingRect.y + (boundingRect.height / 2);
 
 		setTranslate(x, y, dragItem);
