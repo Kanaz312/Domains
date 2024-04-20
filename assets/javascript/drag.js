@@ -67,7 +67,7 @@ function dragEnd(e) {
 
 	if (side !== 0)
 	{
-		fetch("http://localhost:8080/decide", {method : "post", body : JSON.stringify({decision : side})});
+		fetch("/decide", {method : "post", body : JSON.stringify({decision : side})});
 		htmx.trigger("#scenario", "game-state-update");
 		leftAnswer.removeAttribute("style");
 		rightAnswer.removeAttribute("style");
