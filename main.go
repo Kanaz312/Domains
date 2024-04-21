@@ -39,7 +39,7 @@ func main() {
 		mainServerState.InitializeServer()
 
 		goServer := &http.Server{
-			Addr:                         ":8080",
+			Addr:                         ":80",
 			Handler:                      mux,
 			DisableGeneralOptionsHandler: false,
 			ReadTimeout:                  10 * time.Second,
