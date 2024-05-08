@@ -102,6 +102,10 @@ progress {
 	grid-row: 1;
 }
 
+.dialogue {
+	width: 50%;
+}
+
 .left {
 	display: none;
 }

@@ -37,7 +37,7 @@
 	</div>
 </div>
 <div id="scenario" hx-get="/{{ .ReloadEndpoint }}" hx-trigger="game-state-update" hx-target="body" hx-swap="innerHTML swap:0.4s">
-	<div class="scenario-element" id="promt">
+	<div class="scenario-element dialogue" id="promt">
 		{{ .Prompt }}
 	</div>
 	<div class="scenario-element" id="deck">
@@ -49,10 +49,10 @@
 			<img class="card" id="top-card-back" src="/assets/images/cards/cardback2.png" draggable="false">
 		</div>
 	</div>
-	<div class="scenario-element left" id="answer-left">
+	<div class="scenario-element left dialogue" id="answer-left">
 		{{ .LeftDescription }}
 	</div>
-	<div class="scenario-element right" id="answer-right">
+	<div class="scenario-element right dialogue" id="answer-right">
 		{{ .RightDescription }}
 	</div>
 </div>
