@@ -158,6 +158,14 @@ type gameStateElements struct{
 	Image string;
 	LeftDescription string;
 	RightDescription string;
+	MagicLeftIndicator string;
+	MagicRightIndicator string;
+	PopulationLeftIndicator string;
+	PopulationRightIndicator string;
+	SwordLeftIndicator string;
+	SwordRightIndicator string;
+	MoneyLeftIndicator string;
+	MoneyRightIndicator string;
 	ReloadEndpoint string;
 }
 
@@ -177,9 +185,32 @@ func (s *ServerState) populateDeadElements(state *game.Game, data *gameStateElem
 	data.Image = scene.Image
 	data.LeftDescription = scene.Decisions[0].Description
 	data.RightDescription = scene.Decisions[1].Description
+	data.MagicLeftIndicator = getIndicatorImage(0)
+	data.MagicRightIndicator = getIndicatorImage(0)
+	data.PopulationLeftIndicator = getIndicatorImage(0)
+	data.PopulationRightIndicator = getIndicatorImage(0)
+	data.SwordLeftIndicator = getIndicatorImage(0)
+	data.SwordRightIndicator = getIndicatorImage(0)
+	data.MoneyLeftIndicator = getIndicatorImage(0)
+	data.MoneyRightIndicator = getIndicatorImage(0)
 	data.ReloadEndpoint = "results"
 
 	return nil
+}
+
+func getIndicatorImage(ChangeInStat int) string {
+	switch {
+	case ChangeInStat > 20:
+		return "BigPositive"
+	case ChangeInStat > 0:
+		return "SmallPositive"
+	case ChangeInStat < -20:
+		return "BigNegative"
+	case ChangeInStat < 0:
+		return "SmallNegative"
+	default:
+		return "Neutral"
+	}
 }
 
 func (s *ServerState) populateLivingElements(state *game.Game, data *gameStateElements) {
@@ -193,6 +224,14 @@ func (s *ServerState) populateLivingElements(state *game.Game, data *gameStateEl
 	data.Image = scene.Image
 	data.LeftDescription = scene.Decisions[0].Description
 	data.RightDescription = scene.Decisions[1].Description
+	data.MagicLeftIndicator = getIndicatorImage(scene.Decisions[0].Magic)
+	data.MagicRightIndicator = getIndicatorImage(scene.Decisions[1].Magic)
+	data.PopulationLeftIndicator = getIndicatorImage(scene.Decisions[0].Population)
+	data.PopulationRightIndicator = getIndicatorImage(scene.Decisions[1].Population)
+	data.SwordLeftIndicator = getIndicatorImage(scene.Decisions[0].Sword)
+	data.SwordRightIndicator = getIndicatorImage(scene.Decisions[1].Sword)
+	data.MoneyLeftIndicator = getIndicatorImage(scene.Decisions[0].Money)
+	data.MoneyRightIndicator = getIndicatorImage(scene.Decisions[1].Money)
 	data.ReloadEndpoint = "gameStateElements"
 }
 
@@ -231,6 +270,10 @@ func (s *ServerState) DecisionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	currentGameState := &s.Users[index].State
 	currentScenario := s.Scenarios[currentGameState.ScenarioIndex]
+
+	if currentGameState.IsDead() {
+		return
+	}
 	
 	var choice decisionRequest
 	json.NewDecoder(r.Body).Decode(&choice)
@@ -253,8 +296,21 @@ func (s *ServerState) DecisionHandler(w http.ResponseWriter, r *http.Request) {
 
 var resultsTpl = template.Must(template.ParseFiles("assets/static/results.html"))
 
+
+type resultsElements struct{
+	CardsSeen int;
+}
+
 func (s *ServerState) ResultsHandler(w http.ResponseWriter, r *http.Request) {
-	err := resultsTpl.Execute(w, nil)
+	index, err := s.getUserSession(w, r)
+	if err != nil {
+		return
+	}
+	currentGameState := &s.Users[index].State
+
+	data := resultsElements{currentGameState.ScenarioIndex}
+
+	err = resultsTpl.Execute(w, data)
 	if err != nil {
 		fmt.Printf("Failed to execute assets/static/results.html %v\n", err)
 		http.Error(w, "server error", http.StatusInternalServerError)

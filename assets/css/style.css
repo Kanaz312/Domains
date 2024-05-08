@@ -102,10 +102,22 @@ progress {
 	grid-row: 1;
 }
 
-#answer-left {
+.left {
 	display: none;
 }
 
-#answer-right {
+.right {
 	display: none;
+}
+
+.indicator-slot {
+	touch-action: none;
+	user-select: none;
+	display: grid;
+	justify-content: center;
+}
+
+.indicator {
+	grid-column: 1;
+	grid-row: 1;
 }

@@ -3,8 +3,8 @@
 var dragItem = document.querySelector("#top-card");
 var cardBack = document.querySelector("#top-card-back");
 var container = document.querySelector("#top-card-container");
-var leftAnswer = document.querySelector("#answer-left");
-var rightAnswer = document.querySelector("#answer-right");
+var leftElements = document.querySelectorAll(".left");
+var rightElements = document.querySelectorAll(".right");
 var active = false;
 
 container.addEventListener("touchstart", dragStart, false);
@@ -69,8 +69,12 @@ function dragEnd(e) {
 	{
 		fetch("/decide", {method : "post", body : JSON.stringify({decision : side})})
 			.then(() => htmx.trigger("#scenario", "game-state-update"));
-		leftAnswer.removeAttribute("style");
-		rightAnswer.removeAttribute("style");
+		leftElements.forEach(elem => {
+			  elem.style.display = "none";
+		});
+		rightElements.forEach(elem => {
+			  elem.style.display = "none";
+		});
 	}
 
 	if (side === -1) {
@@ -105,14 +109,26 @@ function drag(e) {
 
 		let side = getSide(x);
 		if (side === -1) {
-			leftAnswer.style.display = "block";
-			rightAnswer.style.display = "none";
+			leftElements.forEach(elem => {
+				elem.style.display = "block";
+			});
+			rightElements.forEach(elem => {
+				elem.style.display = "none";
+			});
 		} else if (side === 1) {
-			leftAnswer.style.display = "none";
-			rightAnswer.style.display = "block";
+			leftElements.forEach(elem => {
+				elem.style.display = "none";
+			});
+			rightElements.forEach(elem => {
+				elem.style.display = "block";
+			});
 		} else {
-			leftAnswer.style.display = "none";
-			rightAnswer.style.display = "none";
+			leftElements.forEach(elem => {
+				elem.style.display = "none";
+			});
+			rightElements.forEach(elem => {
+				elem.style.display = "none";
+			});
 		}
 
 		let boundingRect = container.getBoundingClientRect();

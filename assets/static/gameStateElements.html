@@ -2,18 +2,38 @@
 	<div class="stat" id="magic">
 		<h2>Magic</h2>
 		<progress id="magic-bar" class="stat-bar" value="{{ .Magic }}" max="100"></progress>
+		<div class="indicator-slot">
+			<img class="indicator" id="middle" src="/assets/images/indicators/Neutral.png" draggable="false">
+			<img class="indicator left" id="left" src="/assets/images/indicators/{{ .MagicLeftIndicator }}.png" draggable="false">
+			<img class="indicator right" id="right" src="/assets/images/indicators/{{ .MagicRightIndicator }}.png" draggable="false">
+		</div>
 	</div>
 	<div class="stat" id="population">
 		<h2>Population</h2>
 		<progress id="population-bar" class="stat-bar" value="{{ .Population }}" max="100"></progress>
+		<div class="indicator-slot">
+			<img class="indicator" id="middle" src="/assets/images/indicators/Neutral.png" draggable="false">
+			<img class="indicator left" id="left" src="/assets/images/indicators/{{ .PopulationLeftIndicator }}.png" draggable="false">
+			<img class="indicator right" id="right" src="/assets/images/indicators/{{ .PopulationRightIndicator }}.png" draggable="false">
+		</div>
 	</div>
 	<div class="stat" id="sword">
 		<h2>Sword</h2>
 		<progress id="sword-bar" class="stat-bar" value="{{ .Sword }}" max="100"></progress>
+		<div class="indicator-slot">
+			<img class="indicator" id="middle" src="/assets/images/indicators/Neutral.png" draggable="false">
+			<img class="indicator left" id="left" src="/assets/images/indicators/{{ .SwordLeftIndicator }}.png" draggable="false">
+			<img class="indicator right" id="right" src="/assets/images/indicators/{{ .SwordRightIndicator }}.png" draggable="false">
+		</div>
 	</div>
 	<div class="stat" id="money">
 		<h2>Money</h2>
 		<progress id="money-bar" class="stat-bar" value="{{ .Money }}" max="100"></progress>
+		<div class="indicator-slot">
+			<img class="indicator" id="middle" src="/assets/images/indicators/Neutral.png" draggable="false">
+			<img class="indicator left" id="left" src="/assets/images/indicators/{{ .MoneyLeftIndicator }}.png" draggable="false">
+			<img class="indicator right" id="right" src="/assets/images/indicators/{{ .MoneyRightIndicator }}.png" draggable="false">
+		</div>
 	</div>
 </div>
 <div id="scenario" hx-get="/{{ .ReloadEndpoint }}" hx-trigger="game-state-update" hx-target="body" hx-swap="innerHTML swap:0.4s">
@@ -29,10 +49,10 @@
 			<img class="card" id="top-card-back" src="/assets/images/cards/cardback2.png" draggable="false">
 		</div>
 	</div>
-	<div class="scenario-element" id="answer-left">
+	<div class="scenario-element left" id="answer-left">
 		{{ .LeftDescription }}
 	</div>
-	<div class="scenario-element" id="answer-right">
+	<div class="scenario-element right" id="answer-right">
 		{{ .RightDescription }}
 	</div>
 </div>
