@@ -64,6 +64,8 @@ func (s *ServerState) makeSession() (http.Cookie, error) {
 
 		s.NumUsers++
 
+		log.Printf("Creating new user #%d", s.NumUsers)
+
 		return newSessionCookie, nil
 	}
 }
